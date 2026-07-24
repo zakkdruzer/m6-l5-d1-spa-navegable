@@ -1,59 +1,40 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHashHistory } from 'vue-router'
 import BebidasView from '../views/BebidasView.vue'
 import BebidaDetalleView from '../views/BebidaDetalleView.vue'
-import DetallePreparacion from '../views/DetallePreparacion.vue'
-import DetalleIngredientes from '../views/DetalleIngredientes.vue'
 import SobreNosotrosView from '../views/SobreNosotrosView.vue'
 import NotFoundView from '../views/NotFoundView.vue'
 
 const routes = [
   {
     path: '/',
-    redirect: '/bebidas' // Redirect
+    redirect: '/bebidas'
   },
   {
     path: '/bebidas',
     name: 'catalogo',
-    component: BebidasView, // Ruta estática
-    alias: ['/productos', '/lista'] // Alias (mínimo dos)
+    component: BebidasView,
+    alias: ['/productos', '/lista']
   },
   {
     path: '/bebida/:id',
     name: 'detalle',
-    component: BebidaDetalleView, // Ruta dinámica
-    props: true, // Recibe identificador como propiedad
-    children: [
-      {
-        path: '', // Primera pestaña (default)
-        name: 'preparacion',
-        component: DetallePreparacion
-      },
-      {
-        path: 'ingredientes', // Segunda pestaña
-        name: 'ingredientes',
-        component: DetalleIngredientes
-      },
-      {
-        path: 'costos', // Tercera pestaña
-        name: 'costos',
-        component: () => import('../views/DetalleCostos.vue') // Ejemplo de componente creado en línea si te falta uno
-      }
-    ]
+    component: BebidaDetalleView,
+    props: true
   },
   {
     path: '/sobre-nosotros',
     name: 'sobre-nosotros',
-    component: SobreNosotrosView // Ruta estática
+    component: SobreNosotrosView
   },
   {
     path: '/:pathMatch(.*)*',
     name: 'not-found',
-    component: NotFoundView // 404
+    component: NotFoundView
   }
 ]
 
 const router = createRouter({
-  history: createWebHistory(),
+  history: createWebHashHistory(), // Usamos Hash History para compatibilidad total con GitHub Pages
   routes
 })
 

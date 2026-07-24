@@ -1,6 +1,9 @@
 <script setup>
-import { computed } from 'vue';
+import { ref, computed } from 'vue';
 import { bebidas } from '../data/bebidas.js';
+import DetallePreparacion from './DetallePreparacion.vue';
+import DetalleIngredientes from './DetalleIngredientes.vue';
+import DetalleCostos from './DetalleCostos.vue';
 
 const props = defineProps({
   id: {
@@ -9,32 +12,45 @@ const props = defineProps({
   }
 });
 
-// Buscamos la bebida correspondiente de forma reactiva al prop id
+// Pestaña activa por defecto ('preparacion', 'ingredientes', 'costos')
+const pestañaActiva = ref('preparacion');
+
 const bebidaActual = computed(() => {
   return bebidas.find(b => b.id === props.id);
 });
 </script>
 
 <template>
-  <!-- Si la bebida existe -->
   <div v-if="bebidaActual">
     <h2>{{ bebidaActual.nombre }}</h2>
     <p>{{ bebidaActual.descripcion }}</p>
 
+    <!-- Botones de pestañas locales -->
     <nav class="tabs">
-      <router-link :to="{ name: 'preparacion', params: { id: bebidaActual.id } }">Preparación</router-link> |
-      <router-link :to="{ name: 'ingredientes', params: { id: bebidaActual.id } }">Ingredientes</router-link> |
-      <router-link :to="{ name: 'costos', params: { id: bebidaActual.id } }">Costos</router-link>
+      <button 
+        :class="{ active: pestañaActiva === 'preparacion' }" 
+        @click="pestañaActiva = 'preparacion'"
+      >Preparación</button> |
+      <button 
+        :class="{ active: pestañaActiva === 'ingredientes' }" 
+        @click="pestañaActiva = 'ingredientes'"
+      >Ingredientes</button> |
+      <button 
+        :class="{ active: pestañaActiva === 'costos' }" 
+        @click="pestañaActiva = 'costos'"
+      >Costos</button>
     </nav>
 
+    <!-- Contenido dinámico según la pestaña seleccionada -->
     <div class="tab-content">
-      <router-view :bebida="bebidaActual"></router-view>
+      <DetallePreparacion v-if="pestañaActiva === 'preparacion'" :bebida="bebidaActual" />
+      <DetalleIngredientes v-else-if="pestañaActiva === 'ingredientes'" :bebida="bebidaActual" />
+      <DetalleCostos v-else-if="pestañaActiva === 'costos'" :bebida="bebidaActual" />
     </div>
     
-    <router-link :to="{ name: 'catalogo' }">← Volver al catálogo</router-link>
+    <router-link :to="{ name: 'catalogo' }" class="btn-volver">← Volver al catálogo</router-link>
   </div>
 
-  <!-- Si piden un identificador que no existe (Mensaje humano y amigable) -->
   <div v-else class="error-inexistente">
     <h2>Oops, esta bebida no existe</h2>
     <p>El identificador <strong>"{{ props.id }}"</strong> no corresponde a ninguna receta en nuestro catálogo.</p>
@@ -43,8 +59,28 @@ const bebidaActual = computed(() => {
 </template>
 
 <style scoped>
-.tabs { margin: 1rem 0; font-weight: bold; }
-.tab-content { border: 1px dashed #ccc; padding: 1rem; margin-bottom: 1rem; }
+.tabs {
+  margin: 1rem 0;
+}
+.tabs button {
+  background: none;
+  border: none;
+  color: #2563eb;
+  font-weight: bold;
+  cursor: pointer;
+  padding: 0.5rem;
+  font-size: 1rem;
+}
+.tabs button.active {
+  text-decoration: underline;
+  color: #1d4ed8;
+}
+.tab-content { 
+  border: 1px dashed #ccc; 
+  padding: 1rem; 
+  margin-bottom: 1rem; 
+  border-radius: 6px;
+}
 .error-inexistente {
   padding: 2rem;
   text-align: center;
